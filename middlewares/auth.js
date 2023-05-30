@@ -27,10 +27,12 @@ exports.auth = async (req, res, next) => {
     try {
       const decode = jwt.verify(token, process.env.JWT_SECRET);
 
-      console.log(decode);
+      console.log("the value of decode is ",decode);
 
       // seding decod in user
       req.user = decode;
+
+      console.log(req.user)
     } catch (err) {
       return res.status(401).json({
         success: false,
@@ -53,7 +55,7 @@ exports.auth = async (req, res, next) => {
 
 exports.isStudent = async (req, res, next) => {
   try {
-    if (req.user.accoutType !== "Student") {
+    if (req.user.accountType!== "Student") {
       return res.status(401).json({
         success: false,
         message: "You are not student",
@@ -73,7 +75,7 @@ exports.isStudent = async (req, res, next) => {
 
 exports.isInstructor = async (req, res, next) => {
   try {
-    if (req.user.accoutType !== "Instructor") {
+    if (req.user.accountType!== "Instructor") {
       return res.status(401).json({
         success: false,
         message: "You are not Instructor",
@@ -93,7 +95,7 @@ exports.isInstructor = async (req, res, next) => {
 
 exports.isAdmin = async (req, res, next) => {
   try {
-    if (req.user.accoutType !== "Admin") {
+    if (req.user.accountType!== "Admin") {
       return res.status(401).json({
         success: false,
         message: "You are not Admin",

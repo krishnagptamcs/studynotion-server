@@ -1,15 +1,19 @@
 const User = require("../models/User");
 const Profile = require("../models/Profile");
+const {uploadImageToCloudinary} =  require("../utils/imageUploader")
 
 // find schedule of a fucntion call ,that the fucntion should not excute at instance
 
 //UPDATE PROIFLE ****
 
 exports.updateProfile = async (req, res) => {
+
+  // console.log(req.user);
+  console.log(req.body);
   try {
     // get data
 
-    const { dateofBirth = "", contactNumber = "", gender = "" } = req.body;
+    const { dateOfBirth = "", contactNumber = "", about = "" } = req.body;
 
     // get userid
 
@@ -17,9 +21,9 @@ exports.updateProfile = async (req, res) => {
 
     // validation
 
-    if (!dateofBirth || !contactNumber || !gender) {
+    if (!dateOfBirth || !contactNumber || !about) {
       return res.status(400).json({
-        error: "Please add all the details",
+        error: "Please fill  all the details",
 
         success: false,
       });
@@ -29,15 +33,15 @@ exports.updateProfile = async (req, res) => {
 
     const userDetails = await User.findById(id);
 
-    const profileId = userDetails.additionalDetails;
+    const profileDetails = await Profile.findById(userDetails.additionalDetails);
 
-    const profileDetails = await Profile.findById(profileId);
+    
 
     // upaditng the profile details
 
     profileDetails.contactNumber = contactNumber;
-    profileDetails.dateOfBirth = dateofBirth;
-    profileDetails.gender = gender;
+    profileDetails.dateOfBirth = dateOfBirth;
+    profileDetails.about = about;
 
     await profileDetails.save();
 
@@ -53,7 +57,7 @@ exports.updateProfile = async (req, res) => {
 
     return res.status(400).json({
       success: false,
-      message: "error occured whilst updating the profile",
+      message: "error occured while updating the profile",
     });
   }
 };
@@ -126,3 +130,41 @@ exports.getAllUserDetails = async (req, res) => {
     });
   }
 };
+
+// UPLOAD PRFILE PICTURE ****
+
+exports.updateDisplayPicture =  async (req, res)=>{
+  try{
+
+    const displayPicture = req.files.displayPicture;
+    const userId = req.user.id;
+
+    const image = await uploadImageToCloudinary(
+      displayPicture,
+      process.env.FOLDER_NAME,
+      1000,
+      1000
+    )
+
+    console.log(image)
+
+    const updatedProfile = await User.findByIdAndUpdate(
+      { _id: userId },
+      { image: image.secure_url },
+      { new: true }
+    )
+    res.send({
+      success: true,
+      message: `Image Updated successfully`,
+      data: updatedProfile,
+    })
+
+
+  }catch(err){
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    })
+
+  }
+}

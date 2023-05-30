@@ -2,7 +2,7 @@ const SubSection = require("../models/SubSection");
 
 const Section = require("../models/Section");
 
-const { uploadImageToCloduniary } = require("../utils/imageUploader");
+const { uploadImageToCloudinary } = require("../utils/imageUploader");
 
 // CREATE SUB-SECTION ******
 
@@ -10,14 +10,14 @@ exports.createSubSection = async (req, res) => {
   try {
     // fetch data from req.body
 
-    const { sectionId, titile, timeduration, description } = req.body;
+    const { sectionId, title, timeDuration, description } = req.body;
     //extract file/video
 
-    const video = req.file.videoFiles;
+    const video = req.files.videoFile;
 
     //validation
 
-    if (!sectionId || !titile || !timeduration || !description || !video) {
+    if (!sectionId || !title || !timeDuration || !description || !video) {
       return res.status(400).json({
         error: "Please add all the fields",
 
@@ -26,19 +26,19 @@ exports.createSubSection = async (req, res) => {
     }
     // upload file/video to cloudinary
 
-    const uploadDetails = await uploadImageToCloduniary(
+    const uploadDetails = await uploadImageToCloudinary(
       video,
       process.env.FOLDER_NAME
     );
     //create a sub section
 
     const subSectionDetails = await SubSection.create({
-      titile: titile,
-      timeduration: timeduration,
+      title: title,
+      timeDuration: timeDuration,
       videoUrl: uploadDetails.secure_url,
       description: description,
     });
-    // updated the created subsectio in section
+    // updated the created subsection in section
 
     const updatedSection = await Section.findByIdAndUpdate(
       { _id: sectionId },
@@ -48,7 +48,7 @@ exports.createSubSection = async (req, res) => {
         },
       },
       { new: true }
-    ).populate("SubSection");
+    ).populate("subSection");
 
     // return success message
 

@@ -6,13 +6,13 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { mailSender } = require("../utils/mailSender");
 
-require("dotenv").config();
-
 
 
 // SIGNUP LOGIC*****
 
 exports.signup = async (req, res) => {
+
+  console.log(req.body)
   try {
     // DATA FETCHED FROM BODY
 
@@ -54,10 +54,10 @@ exports.signup = async (req, res) => {
 
     const existingUser = await User.findOne({ email });
 
-    if (!existingUser) {
+    if (existingUser) {
       return res.status(401).json({
         success: false,
-        message: "User Does Not Exist",
+        message: "user already exist , pls signup to continue",
       });
     }
 
@@ -110,7 +110,7 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
       accountType,
       additionalDetails: profileDetails._id,
-      image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
+      image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName}${lastName}`,
     });
 
     // RETURNING SUCCESFUL RESPONSE
@@ -132,6 +132,7 @@ exports.signup = async (req, res) => {
 // LOGIN LOGIC*******
 
 exports.login = async (req, res) => {
+  console.log(req.body)
   try {
     //GET DATA FROM REQ.BODY
 
@@ -159,15 +160,13 @@ exports.login = async (req, res) => {
     // GENERATE JWT , AFTER PASSWORD MATCH
 
     if (await bcrypt.compare(password, user.password)) {
-      const payload = {
-        email: user.email,
-        id: user._id,
-        role: user.role,
-        accountType: user.accountType,
-      };
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "2h",
-      });
+      const token = jwt.sign(
+				{ email: user.email, id: user._id, accountType: user.accountType },
+				process.env.JWT_SECRET,
+				{
+					expiresIn: "24h",
+				}
+			);
 
       // save token to user document in database
       user.token = token;
@@ -180,9 +179,8 @@ exports.login = async (req, res) => {
         expiresIn: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       };
 
-      res.cookies("token", token, option).status(200).json({
+      res.cookie("token", token, option).status(200).json({
         success: true,
-
         message: "Login Success",
         user,
         token,
@@ -209,7 +207,7 @@ exports.login = async (req, res) => {
 // SEND OTP ****
 
 exports.sendOTP = async (req, res) => {
-  console.log("hello ji i am from otp")
+  // console.log("hello ji i am from otp")
   try { 
     const { email } = req.body;
 

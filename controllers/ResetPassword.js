@@ -1,5 +1,7 @@
 const User = require("../models/User");
-const mailSender = require("../utils/mailSender");
+const {mailSender} = require("../utils/mailSender");
+const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 //LOGIC FOR GENERATING MAIL FOR RESET PASSWORD*********
 
@@ -21,7 +23,7 @@ exports.resetPasswordToken = async (req, res) => {
     }
     //generate token or random uuid genrate
 
-    const token = crypto.randomUUID();
+    const token = crypto.randomBytes(20).toString("hex");
 
     //update user by adding token and expiration time
 
@@ -43,8 +45,8 @@ exports.resetPasswordToken = async (req, res) => {
 
     await mailSender(
       email,
-      "Password Reset Link",
-      `Password Reset Link:${url}`
+			"Password Reset",
+			`Your Link for email verification is ${url}. Please click this url to reset your password.`
     );
 
     // return response

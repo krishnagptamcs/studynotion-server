@@ -23,7 +23,7 @@ exports.createSection = async (req, res) => {
     //update the created section in course
 
     const updatedCourseDetails = await Course.findByIdAndUpdate(
-      { courseId },
+      courseId ,
       {
         $push: {
           courseContent: newSection._id,

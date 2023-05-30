@@ -21,7 +21,7 @@ exports.createCourse = async (req, res) => {
 
     // get thumbnail
 
-    const thumbnail = req.file.thumbnailImages;
+    const thumbnail = req.files.thumbnailImage;
 
     //validation
 
@@ -31,7 +31,8 @@ exports.createCourse = async (req, res) => {
       !whatYouWillLearn ||
       !price ||
       !tag ||
-      !thumbnail
+      !thumbnail ||
+      !category
     ) {
       res.status(400).json({
         success: false,
@@ -62,7 +63,7 @@ exports.createCourse = async (req, res) => {
     if (!categoryDetails) {
       return res.status(400).json({
         success: false,
-        message: "Please add tag first , tag details not found",
+        message: "Category Details Not Found",
       });
     }
 
@@ -83,7 +84,7 @@ exports.createCourse = async (req, res) => {
       instructor: instructorDetails._id,
       whatYouWillLearn: whatYouWillLearn,
       price,
-      tag: tagDetails._id,
+      tag: tag,
       category: categoryDetails._id,
       thumbnail: thumbnailImages.secure_url,
     });
@@ -91,7 +92,7 @@ exports.createCourse = async (req, res) => {
     // add the new course to the user schema of instructor
 
     await User.findByIdAndUpdate(
-      { id: instructorDetails._id },
+      { _id: instructorDetails._id },
 
       {
         $push: {
@@ -104,7 +105,7 @@ exports.createCourse = async (req, res) => {
     // add the new course to the cateogry
 
     await Category.findByIdAndUpdate(
-      { id: category },
+      { _id: category },
       {
         $push: {
           courses: newCourse._id,
@@ -117,6 +118,7 @@ exports.createCourse = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      data: newCourse,
       message: "Course created  successfully",
     });
   } catch (error) {
@@ -172,19 +174,18 @@ exports.getCourseDetails = async (req, res) => {
       .populate({
         path: "instructor",
         populate: {
-          path: "additionDetails",
+          path: "additionalDetails",
         },
       })
       .populate("category")
-      .populate("ratingAndreviews")
+      // .populate("ratingAndreviews")
       .populate({
         path: "courseContent",
         populate: {
           path: "subSection",
         },
-      });
-
-    exec();
+      })
+      . exec();
 
     // validation
 
@@ -198,15 +199,15 @@ exports.getCourseDetails = async (req, res) => {
     // return return for all okay
 
     return res.status(200).json({
-      error: "Course found",
+      message: "Course found",
       success: "true",
       data: courseDetails,
     });
   } catch (error) {
-    console.log("the error coming while get all course is ", error);
+    console.log("the error coming while get coursee details is ", error);
 
     return res.status(400).json({
-      error: "error ocured while getting all course",
+      error: "error ocured while getting course details",
       success: "true",
     });
   }

@@ -5,7 +5,7 @@ const {
   deleteAccount,
   updateProfile,
   getAllUserDetails,
-  // updateDisplayPicture,
+  updateDisplayPicture,
   // getEnrolledCourses,
 } = require("../controllers/Profile")
 
@@ -18,6 +18,6 @@ router.put("/updateProfile", auth, updateProfile)
 router.get("/getUserDetails", auth, getAllUserDetails)
 // Get Enrolled Courses
 // router.get("/getEnrolledCourses", auth, getEnrolledCourses)
-// router.put("/updateDisplayPicture", auth, updateDisplayPicture)
+router.put("/updateDisplayPicture", auth, updateDisplayPicture)
 
 module.exports = router

@@ -1,6 +1,5 @@
 const nodemailer = require("nodemailer");
 
-require("dotenv").config();
 
 exports.mailSender = async (email, title, body) => {
   try {
@@ -16,7 +15,7 @@ exports.mailSender = async (email, title, body) => {
       from: "StudyNotion || Krishna Gupta",
       to: `${email}`,
       subject: `${title}`,
-      text: `${body}`,
+      html: `${body}`,
     });
 
     console.log(info);

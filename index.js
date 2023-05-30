@@ -43,8 +43,8 @@ app.use(
 
 app.use(
   fileUpload({
-    useTempFiles: true,
-    tempFileDir: "/tmp",
+    useTempFiles:true,
+    tempFileDir:"/tmp",
   })
 );
 
@@ -54,8 +54,6 @@ cloudinaryConnect();
 // routes
 
 app.use("/api/v1/auth", userRoutes);
-
-// console.log(userRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/course", courseRoutes);
 app.use("/api/v1/payment", paymentRoutes);
